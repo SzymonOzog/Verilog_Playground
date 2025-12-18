@@ -17,19 +17,19 @@ module tb;
         b = 8'd5;
         carry_in = 0;
         
-        #1 assert(y === 8'd10) else $fatal(1, "wrong output for a %b b %b y=%b", a, b, y);
+        #1 assert(y === 8'd10 & carry === 1'b0) else $fatal(1, "wrong output for a %b b %b y=%b", a, b, y);
 
         a = 8'd8;
         b = 8'd5;
         carry_in = 0;
         
-        #1 assert(y === 8'd13) else $fatal(1, "wrong output for a %b b %b y=%b", a, b, y);
+        #1 assert(y === 8'd13 & carry === 1'b0) else $fatal(1, "wrong output for a %b b %b y=%b", a, b, y);
 
         a = 8'd8;
         b = 8'd5;
         carry_in = 1;
         
-        #1 assert(y === 8'd3) else $fatal(1, "wrong output for a %b b %b y=%b", a, b, y);
+        #1 assert(y === 8'd3 & carry === 1'b1) else $fatal(1, "wrong output for a %b b %b y=%b", a, b, y);
 
         $display("All test passed");
         $finish;
