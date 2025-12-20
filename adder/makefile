@@ -1,11 +1,9 @@
-BUILD ?= build
-
+OUT := adder.out
 SRC := $(wildcard *.v)
 
 run:
-	mkdir -p build
-	iverilog -g2012 -Wall $(SRC)
-	vvp a.out
+	iverilog -g2012 -o $(OUT) -Wall $(SRC)
+	vvp $(OUT) 
 
 clean:
-	rm -rf build
+	rm -rf $(OUT) dump.vcd
