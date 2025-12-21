@@ -39,3 +39,70 @@ module adder8(
     adder1 a7(a[7], bin[7], carry[6], y[7], carry_out);
 
 endmodule
+
+module ripple_adder4(
+        input wire[3:0] a,
+        input wire[3:0] b,
+        input wire carry_in,
+        output wire[3:0] y,
+        output wire P,
+        output wire G
+    );
+    wire [3:0] p;
+    wire [3:0] g;
+
+    assign p[0] = a[0] | b[0];
+    assign p[1] = a[1] | b[1];
+    assign p[2] = a[2] | b[2];
+    assign p[3] = a[3] | b[3];
+
+    assign g[0] = a[0] & b[0];
+    assign g[1] = a[1] & b[1];
+    assign g[2] = a[2] & b[2];
+    assign g[3] = a[3] & b[3];
+
+    assign P = p[0] & p[1] & p[2] & p[3];
+    assign G = (g[0] & p[1] & p[2] & p[3]) 
+                | (g[1] & p[2] & p[3]) 
+                | (g[2] & p[3])
+                | g[3];
+
+    wire c[2:0];
+    assign c[0] = g[0] | (p[0] & carry_in);
+    assign c[1] = g[1] | (p[1] & g[0]) | (p[0] & p[1] & carry_in);
+    assign c[2] = g[2] | (p[2] & g[2]) | (p[1] & p[0] & g[0]) | (p[0] & p[1] & p[2] & carry_in);
+
+    assign y[0] = a[0] ^ b[0] ^ carry_in;
+    assign y[1] = a[1] ^ b[1] ^ c[0];
+    assign y[2] = a[2] ^ b[2] ^ c[1];
+    assign y[3] = a[3] ^ b[3] ^ c[2];
+
+endmodule
+
+module ripple_adder8(
+        input wire[7:0] a,
+        input wire[7:0] b,
+        input wire carry_in,
+        output wire[7:0] y,
+        output wire carry_out
+        );
+    wire [7:0] bin;
+
+    assign bin[0] = b[0]^carry_in;
+    assign bin[1] = b[1]^carry_in;
+    assign bin[2] = b[2]^carry_in;
+    assign bin[3] = b[3]^carry_in;
+    assign bin[4] = b[4]^carry_in;
+    assign bin[5] = b[5]^carry_in;
+    assign bin[6] = b[6]^carry_in;
+    assign bin[7] = b[7]^carry_in;
+
+    wire [1:0] P;
+    wire [1:0] G;
+
+    ripple_adder4 a0(a[3:0], bin[3:0], carry_in, y[3:0], P[0], G[0]);
+    wire C = G[0] | (P[0] * carry_in);
+    ripple_adder4 a1(a[7:4], bin[7:4], C, y[7:4], P[1], G[1]);
+    assign carry_out = G[1] | (G[0] & P[1]) | (P[1] & P[0] & carry_in);
+
+endmodule
