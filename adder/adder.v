@@ -70,7 +70,7 @@ module ripple_adder4(
     wire c[2:0];
     assign c[0] = g[0] | (p[0] & carry_in);
     assign c[1] = g[1] | (p[1] & g[0]) | (p[0] & p[1] & carry_in);
-    assign c[2] = g[2] | (p[2] & g[2]) | (p[1] & p[0] & g[0]) | (p[0] & p[1] & p[2] & carry_in);
+    assign c[2] = g[2] | (p[2] & g[1]) | (p[2] & p[1] & g[0]) | (p[0] & p[1] & p[2] & carry_in);
 
     assign y[0] = a[0] ^ b[0] ^ carry_in;
     assign y[1] = a[1] ^ b[1] ^ c[0];

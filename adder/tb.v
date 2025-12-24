@@ -58,6 +58,13 @@ module tb;
         #1 assert(y === 8'd127 & carry === 1'b1) else $fatal(1, "wrong output for a %b b %b y=%b", a, b, y);
         #1 assert(y2 === 8'd127 & carry2 === 1'b1) else $fatal(1, "wrong ripple output for a %b b %b y=%b", a, b, y2);
 
+        a = 8'd11;
+        b = 8'd1;
+        carry_in = 0;
+        
+        #1 assert(y === 8'd12 & carry === 1'b0) else $fatal(1, "wrong output for a %b b %b y=%b", a, b, y);
+        #1 assert(y2 === 8'd12 & carry2 === 1'b0) else $fatal(1, "wrong ripple output for a %b b %b y=%b", a, b, y2);
+
         $display("All test passed");
         $finish;
     end
