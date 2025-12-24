@@ -53,7 +53,7 @@ module tb;
         #1 assert(y === 8'd250 && overflow == 1'b0) else $fatal(1, "wrong output for a %b b %b y=%b, expected %b", 
             a, b, y, 8'd250);
 
-        a = 8'd12;
+        a = 8'd11;
         b = 8'd25;
         
         #1 assert(overflow == 1'b1) else $fatal(1, "wrong output for a %b b %b y=%b, overflow not detected", 
