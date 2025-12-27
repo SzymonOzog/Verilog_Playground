@@ -2,7 +2,7 @@ module tb;
     reg[7:0] a;
     reg[7:0] b;
     wire[7:0] y;
-    wire[7:0] expected;
+    reg[7:0] expected;
 
     float_adder_e4m3 adder(a, b, y);
 
