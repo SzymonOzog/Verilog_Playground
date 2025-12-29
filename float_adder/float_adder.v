@@ -1,6 +1,7 @@
 module float_adder_e4m3(
         input wire[7:0] a,
         input wire[7:0] b,
+        input wire clock,
         output wire[7:0] y
         );
 

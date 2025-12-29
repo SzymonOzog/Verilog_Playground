@@ -3,13 +3,17 @@ module tb;
     reg[7:0] b;
     wire[7:0] y;
     reg[7:0] expected;
+    reg clock;
 
-    float_adder_e4m3 adder(a, b, y);
+    float_adder_e4m3 adder(a, b, clock, y);
+
+    always #1 clock = ~clock;
 
 
     initial begin
         $dumpfile("dump.vcd");
         $dumpvars(0, tb);
+        clock = 1'b1;
 
         a = 8'b01000000;
         b = 8'b01000000;
