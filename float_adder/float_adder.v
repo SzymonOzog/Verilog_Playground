@@ -3,7 +3,8 @@ module float_adder_e4m3(
         input wire[7:0] b,
         input wire clock,
         input wire reset,
-        output wire[7:0] y
+        output wire[7:0] y,
+        output wire is_output_valid
         );
 
         wire[3:0] a_e = a[6:3];
@@ -31,6 +32,8 @@ module float_adder_e4m3(
 
         reg[1:0] curr_state;
         reg[1:0] next_state;
+        reg next_valid;
+        reg valid;
 
         parameter EXP = 2'd1;
         parameter NORM = 2'd2;
@@ -43,12 +46,14 @@ module float_adder_e4m3(
                 curr_state <= EXP;
                 m_sum <= 4'd0;
                 e_sum <= 3'd0;
+                valid <= 1'b0;
             end
             else
             begin
                 curr_state <= next_state;
                 m_sum <= m_sum_next;
                 e_sum <= e_sum_next;
+                valid <= next_valid;
             end
         end
 
@@ -84,7 +89,8 @@ module float_adder_e4m3(
 
                 NORM:
                 begin
-                    if (!m_sum[3])
+                    next_valid = m_sum[3];
+                    if (!next_valid)
                     begin
                         add_carry = m_sum[4] & !(a[7] & b[7]);
                         m_sum_next = add_carry ? m_sum >> 1 : m_sum << 1;
@@ -97,4 +103,5 @@ module float_adder_e4m3(
         assign y[7] = (a[7] & b[7]) || (m_sum_tmp[3] & (a[7] ^ b[7]));
         assign y[6:3] = e_sum;
         assign y[2:0] = m_sum[2:0];
+        assign is_output_valid = valid;
 endmodule
