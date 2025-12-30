@@ -34,6 +34,7 @@ module float_adder_e4m3(
         reg[1:0] next_state;
         reg next_valid;
         reg valid;
+        reg sub_borrow;
 
         parameter EXP = 2'd1;
         parameter NORM = 2'd2;
@@ -83,7 +84,8 @@ module float_adder_e4m3(
                     m_sum_tmp = a[7] ? b_m_aligned - a_m_aligned : 
                                 b[7] ? a_m_aligned - b_m_aligned :
                                        a_m_aligned + b_m_aligned;
-                    m_sum_next = m_sum_tmp[4] ? ~(m_sum_tmp) + 1'b1 : m_sum_tmp;
+                    sub_borrow = (m_sum_tmp[4] & (a[7] ^ b[7]));
+                    m_sum_next = sub_borrow ? ~(m_sum_tmp) + 1'b1 : m_sum_tmp;
                     next_state = NORM;
                 end
 
@@ -100,7 +102,7 @@ module float_adder_e4m3(
             endcase
         end
 
-        assign y[7] = (a[7] & b[7]) || (m_sum_tmp[3] & (a[7] ^ b[7]));
+        assign y[7] = (a[7] & b[7]) || sub_borrow;
         assign y[6:3] = e_sum;
         assign y[2:0] = m_sum[2:0];
         assign is_output_valid = valid;
