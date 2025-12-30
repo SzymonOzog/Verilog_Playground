@@ -48,6 +48,7 @@ module float_adder_e4m3(
                 m_sum <= 4'd0;
                 e_sum <= 3'd0;
                 valid <= 1'b0;
+                next_valid <= 1'b0;
             end
             else
             begin
@@ -81,9 +82,10 @@ module float_adder_e4m3(
                         b_e_aligned = b_e + shift_amt;
                         e_sum_next = a_e;
                     end
-                    m_sum_tmp = a[7] ? b_m_aligned - a_m_aligned : 
-                                b[7] ? a_m_aligned - b_m_aligned :
-                                       a_m_aligned + b_m_aligned;
+                    m_sum_tmp = !(a[7] ^ b[7]) ? a_m_aligned + b_m_aligned :
+                                a[7]           ? b_m_aligned - a_m_aligned : 
+                                                 a_m_aligned - b_m_aligned ;
+                                       
                     sub_borrow = (m_sum_tmp[4] & (a[7] ^ b[7]));
                     m_sum_next = sub_borrow ? ~(m_sum_tmp) + 1'b1 : m_sum_tmp;
                     next_state = NORM;
@@ -103,7 +105,7 @@ module float_adder_e4m3(
                     end
                     if (!next_valid)
                     begin
-                        add_carry = m_sum[4] & !(a[7] & b[7]);
+                        add_carry = m_sum[4] & !(a[7] ^ b[7]);
                         m_sum_next = add_carry ? m_sum >> 1 : m_sum << 1;
                         e_sum_next = add_carry ? e_sum + 1'b1 : e_sum - 1'b1;
                     end
