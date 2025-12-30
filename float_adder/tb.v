@@ -46,6 +46,15 @@ module tb;
         #10 assert(y === expected & is_output_valid) else $fatal(1, "wrong output for a %b b %b y=%b, expected %b", 
             a, b, y, expected);
 
+        a = 8'b01010000;
+        b = 8'b11010000;
+        expected = 8'b00000000;
+
+        #1 reset = 1'b1;
+        #2 reset = 1'b0;
+
+        #10 assert(y === expected & is_output_valid) else $fatal(1, "wrong output for a %b b %b y=%b, expected %b", 
+            a, b, y, expected);
 
         $display("All test passed");
         $finish;

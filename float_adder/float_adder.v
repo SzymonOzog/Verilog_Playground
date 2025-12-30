@@ -91,7 +91,16 @@ module float_adder_e4m3(
 
                 NORM:
                 begin
-                    next_valid = m_sum[3];
+                    //TODO is there a smarter way to do this
+                    if (m_sum == 4'd0)
+                    begin
+                        next_valid = 1'b1;
+                        e_sum_next = 4'd0;
+                    end
+                    else
+                    begin
+                        next_valid = m_sum[3];
+                    end
                     if (!next_valid)
                     begin
                         add_carry = m_sum[4] & !(a[7] & b[7]);
