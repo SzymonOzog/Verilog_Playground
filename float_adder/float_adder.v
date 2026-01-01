@@ -34,12 +34,15 @@ module float_adder_e4m3(
         reg[1:0] next_state;
         reg next_valid;
         reg valid;
-        reg sub_borrow;
+
+        wire sub_borrow;
+        wire add_carry;
 
         parameter EXP = 2'd1;
         parameter NORM = 2'd2;
+        assign sub_borrow = (m_sum_tmp[4] & (a[7] ^ b[7]));
+        assign add_carry = m_sum[4] & !(a[7] ^ b[7]);
 
-        reg add_carry;
         always @ (posedge clock or posedge reset)
         begin
             if (reset)
@@ -86,7 +89,6 @@ module float_adder_e4m3(
                                 a[7]           ? b_m_aligned - a_m_aligned : 
                                                  a_m_aligned - b_m_aligned ;
                                        
-                    sub_borrow = (m_sum_tmp[4] & (a[7] ^ b[7]));
                     m_sum_next = sub_borrow ? ~(m_sum_tmp) + 1'b1 : m_sum_tmp;
                     next_state = NORM;
                 end
@@ -105,7 +107,6 @@ module float_adder_e4m3(
                     end
                     if (!next_valid)
                     begin
-                        add_carry = m_sum[4] & !(a[7] ^ b[7]);
                         m_sum_next = add_carry ? m_sum >> 1 : m_sum << 1;
                         e_sum_next = add_carry ? e_sum + 1'b1 : e_sum - 1'b1;
                     end
