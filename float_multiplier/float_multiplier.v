@@ -20,8 +20,9 @@ module float_multiplier_e4m3(
         reg[4:0] y_e;
         reg[4:0] y_e_next;
 
-        reg[7:0] y_m;
-        reg[7:0] y_m_next;
+        reg[4:0] y_m;
+        reg[4:0] y_m_next;
+        reg[7:0] y_m_mul;
 
         reg[1:0] curr_state;
         reg[1:0] next_state;
@@ -33,7 +34,6 @@ module float_multiplier_e4m3(
         parameter MUL = 2'd1;
         parameter NORM = 2'd2;
         parameter BIAS = 4'd7;
-        assign rshift = y_m[7] | y_m[6] | y_m[5] | y_m[4];
 
         always @ (posedge clock or posedge reset)
         begin
@@ -59,8 +59,8 @@ module float_multiplier_e4m3(
             case(curr_state)
                 MUL:
                 begin
-                    //TODO this mul is wrong
-                    y_m_next = a_m * b_m;
+                    y_m_mul = (a_m * b_m);
+                    y_m_next = y_m_mul[7:3];
                     y_e_next = a_e + b_e - BIAS;
                     next_state = NORM;
                 end
@@ -70,8 +70,8 @@ module float_multiplier_e4m3(
                     next_valid = y_m[3];
                     if (!next_valid)
                     begin
-                        y_m_next = rshift ? y_m >> 1 : y_m << 1;
-                        y_e_next = rshift ? y_e + 1'b1 : y_e - 1'b1;
+                        y_m_next = y_m >> 1;
+                        y_e_next = y_e + 1'b1;
                     end
                 end
             endcase
