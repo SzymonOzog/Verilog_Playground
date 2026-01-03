@@ -41,8 +41,11 @@ module float_multiplier_e4m3(
             if (reset)
             begin
                 curr_state <= MUL;
-                y_e <= 4'd0;
-                y_m <= 3'd0;
+                next_state <= MUL;
+                y_e <= 5'd0;
+                y_m <= 5'd0;
+                y_e_next <= 5'd0;
+                y_m_next <= 5'd0;
                 valid <= 1'b0;
                 next_valid <= 1'b0;
             end
@@ -60,9 +63,21 @@ module float_multiplier_e4m3(
             case(curr_state)
                 MUL:
                 begin
-                    y_m_next = y_m_mul[7:3];
-                    y_e_next = a_e + b_e - BIAS;
-                    next_state = NORM;
+                    if (a == 8'b00000000 || 
+                        a == 8'b10000000 || 
+                        b == 8'b00000000 || 
+                        b == 8'b10000000 )
+                    begin
+                        y_e_next = 5'd0;
+                        y_m_next = 5'd0;
+                        next_valid = 1'b1;
+                    end
+                    else 
+                    begin
+                        y_m_next = y_m_mul[7:3];
+                        y_e_next = a_e + b_e - BIAS;
+                        next_state = NORM;
+                    end
                 end
 
                 NORM:
