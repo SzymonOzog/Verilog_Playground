@@ -22,7 +22,7 @@ module float_multiplier_e4m3(
 
         reg[4:0] y_m;
         reg[4:0] y_m_next;
-        reg[7:0] y_m_mul;
+        wire[7:0] y_m_mul;
 
         reg[1:0] curr_state;
         reg[1:0] next_state;
@@ -33,6 +33,8 @@ module float_multiplier_e4m3(
         parameter MUL = 2'd1;
         parameter NORM = 2'd2;
         parameter BIAS = 4'd7;
+
+        assign y_m_mul = (a_m * b_m);
 
         always @ (posedge clock or posedge reset)
         begin
@@ -58,7 +60,6 @@ module float_multiplier_e4m3(
             case(curr_state)
                 MUL:
                 begin
-                    y_m_mul = (a_m * b_m);
                     y_m_next = y_m_mul[7:3];
                     y_e_next = a_e + b_e - BIAS;
                     next_state = NORM;
