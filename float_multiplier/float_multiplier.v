@@ -26,10 +26,9 @@ module float_multiplier_e4m3(
 
         reg[1:0] curr_state;
         reg[1:0] next_state;
+
         reg next_valid;
         reg valid;
-
-        wire rshift;
 
         parameter MUL = 2'd1;
         parameter NORM = 2'd2;
