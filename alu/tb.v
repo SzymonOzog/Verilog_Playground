@@ -6,9 +6,9 @@ module tb;
     reg clock;
     reg reset;
     reg is_output_valid;
-    reg opcode [3:0]
+    reg[3:0] alu_ctrl;
 
-    alu a(a, b, opcode, clock, reset, y, is_output_valid);
+    alu al(a, b, alu_ctrl, clock, reset, y, is_output_valid);
 
     always #1 clock = ~clock;
 
@@ -17,7 +17,7 @@ module tb;
         $dumpvars(0, tb);
         clock = 1'b1;
         reset = 1'b1;
-        opcode = 0'b0001;
+        alu_ctrl = 4'b0001;
 
         //FP8 ADD
         a = 8'b01000000;
@@ -90,7 +90,7 @@ module tb;
             a, b, y, expected);
 
         // FP8 MULTIPLY
-        opcode = 0'b0010;
+        alu_ctrl = 4'b0010;
 
         a = 8'b01000000;
         b = 8'b01000000;
