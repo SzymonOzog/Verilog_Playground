@@ -23,8 +23,8 @@ module alu(
         assign y = out;
         assign is_output_valid = valid;
 
-        float_adder_e4m3 adder(a, b, clock, reset, mul_y, mul_valid);
-        float_multiplier_e4m3 multiplier(a, b, clock, reset, add_y, add_valid);
+        float_adder_e4m3 adder(a, b, clock, reset, add_y, add_valid);
+        float_multiplier_e4m3 multiplier(a, b, clock, reset, mul_y, mul_valid);
 
         always @ (posedge clock or posedge reset)
         begin
