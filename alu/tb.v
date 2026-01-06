@@ -34,7 +34,7 @@ module tb;
         expected = 8'b00101001;
 
         #1 reset = 1'b1;
-        #2 reset = 1'b0;
+        #1 reset = 1'b0;
 
         #10 assert(y === expected & is_output_valid) else $fatal(1, "wrong output for a %b b %b y=%b, expected %b", 
             a, b, y, expected);
@@ -44,7 +44,7 @@ module tb;
         expected = 8'b01010000;
 
         #1 reset = 1'b1;
-        #2 reset = 1'b0;
+        #1 reset = 1'b0;
 
         #10 assert(y === expected & is_output_valid) else $fatal(1, "wrong output for a %b b %b y=%b, expected %b", 
             a, b, y, expected);
@@ -54,7 +54,7 @@ module tb;
         expected = 8'b00000000;
 
         #1 reset = 1'b1;
-        #2 reset = 1'b0;
+        #1 reset = 1'b0;
 
         #10 assert(y === expected & is_output_valid) else $fatal(1, "wrong output for a %b b %b y=%b, expected %b", 
             a, b, y, expected);
@@ -64,7 +64,7 @@ module tb;
         expected = 8'b00101000;
 
         #1 reset = 1'b1;
-        #2 reset = 1'b0;
+        #1 reset = 1'b0;
 
         #10 assert(y === expected & is_output_valid) else $fatal(1, "wrong output for a %b b %b y=%b, expected %b", 
             a, b, y, expected);
@@ -74,7 +74,7 @@ module tb;
         expected = 8'b11001000;
 
         #1 reset = 1'b1;
-        #2 reset = 1'b0;
+        #1 reset = 1'b0;
 
         #10 assert(y === expected & is_output_valid) else $fatal(1, "wrong output for a %b b %b y=%b, expected %b", 
             a, b, y, expected);
@@ -84,7 +84,7 @@ module tb;
         expected = 8'b11010100;
 
         #1 reset = 1'b1;
-        #2 reset = 1'b0;
+        #1 reset = 1'b0;
 
         #10 assert(y === expected & is_output_valid) else $fatal(1, "wrong output for a %b b %b y=%b, expected %b", 
             a, b, y, expected);
