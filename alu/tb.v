@@ -90,7 +90,7 @@ module tb;
             a, b, y, expected);
 
         // FP8 MULTIPLY
-        alu_ctrl = 4'b0010;
+        #1 alu_ctrl = 4'b0010;
 
         a = 8'b01000000;
         b = 8'b01000000;
