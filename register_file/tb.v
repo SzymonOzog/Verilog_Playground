@@ -14,7 +14,7 @@ module tb;
     reg clock;
     reg write;
 
-    reg_file r_file(r1_addr, r2_addr, write_addr, write_data, write_ctrl, clock, r1_out, r2_out);
+    reg_file r_file(r1_addr, r2_addr, write_addr, write_data, write, clock, r1_out, r2_out);
 
     always #1 clock = ~clock;
 
@@ -27,9 +27,8 @@ module tb;
         write_addr = 8'd10;
         write_data = 8'b01010101;
 
-        #2 write = 1'b0;
-
         r1_addr = write_addr;
+        #2 write = 1'b0;
 
         #1 assert(r1_out === write_data) else $fatal(1, "wrong register read data, expected %b, got %b", 
             write_data, r1_out);
