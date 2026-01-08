@@ -14,7 +14,7 @@ module tb;
     reg clock;
     reg write;
 
-    reg_file reg(r1_addr, r2_addr, write_addr, write_data, write_ctrl, clock, r1_out, r2_out);
+    reg_file r_file(r1_addr, r2_addr, write_addr, write_data, write_ctrl, clock, r1_out, r2_out);
 
     always #1 clock = ~clock;
 
