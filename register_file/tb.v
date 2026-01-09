@@ -33,6 +33,25 @@ module tb;
         #1 assert(r1_out === write_data) else $fatal(1, "wrong register read data, expected %b, got %b", 
             write_data, r1_out);
 
+
+        #2 write_addr = 8'd11;
+        write = 1'b1;
+        write_data = 8'b00000101;
+
+        r1_addr = write_addr;
+        expected1 = write_data;
+
+        #2 write_addr = 8'd15;
+        write_data = 8'b11111111;
+
+        r2_addr = write_addr;
+        expected2 = write_data;
+
+        #2 assert(r1_out === expected1) else $fatal(1, "wrong register read data, expected %b, got %b", 
+            expected1, r1_out);
+        assert(r2_out === expected2) else $fatal(1, "wrong register read data, expected %b, got %b", 
+            expected2, r2_out);
+
         
         $display("All test passed");
         $finish;
