@@ -166,8 +166,8 @@ module float_multiplier_bf16(
                     if (a == 16'h00 || a == 16'h80 || 
                         b == 16'h00 || b == 16'h80 )
                     begin
-                        y_e_next = 5'd0;
-                        y_m_next = 5'd0;
+                        y_e_next = 8'd0;
+                        y_m_next = 7'd0;
                         next_valid = 1'b1;
                     end
                     else 
