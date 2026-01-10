@@ -132,7 +132,7 @@ module float_multiplier_bf16(
 
         parameter MUL = 2'd1;
         parameter NORM = 2'd2;
-        parameter BIAS = 4'd7;
+        parameter BIAS = 8'd127;
 
         assign y_m_mul = (a_m * b_m);
 
