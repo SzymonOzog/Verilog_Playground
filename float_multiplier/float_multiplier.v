@@ -113,16 +113,15 @@ module float_multiplier_bf16(
         wire[7:0] a_e = a[14:7];
         wire[7:0] b_e = b[14:7];
 
-
-        wire[6:0] a_m = {1'b1, a[6:0]};
-        wire[6:0] b_m = {1'b1, b[6:0]};
+        wire[7:0] a_m = {1'b1, a[6:0]};
+        wire[7:0] b_m = {1'b1, b[6:0]};
 
         reg[7:0] y_e;
         reg[7:0] y_e_next;
 
-        reg[6:0] y_m;
-        reg[6:0] y_m_next;
-        wire[11:0] y_m_mul;
+        reg[8:0] y_m;
+        reg[8:0] y_m_next;
+        wire[15:0] y_m_mul;
 
         reg[1:0] curr_state;
         reg[1:0] next_state;
@@ -172,7 +171,7 @@ module float_multiplier_bf16(
                     end
                     else 
                     begin
-                        y_m_next = y_m_mul[11:3];
+                        y_m_next = y_m_mul[15:7];
                         y_e_next = a_e + b_e - BIAS;
                         next_state = NORM;
                     end
@@ -180,7 +179,7 @@ module float_multiplier_bf16(
 
                 NORM:
                 begin
-                    next_valid = y_m[5];
+                    next_valid = y_m[7];
                     if (!next_valid)
                     begin
                         y_m_next = y_m >> 1;
