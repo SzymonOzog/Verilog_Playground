@@ -131,6 +131,7 @@ module float_multiplier_bf16(
 
         parameter MUL = 2'd1;
         parameter NORM = 2'd2;
+        parameter ROUND = 2'd3;
         parameter BIAS = 8'd127;
 
         assign y_m_mul = (a_m * b_m);
@@ -179,20 +180,23 @@ module float_multiplier_bf16(
 
                 NORM:
                 begin
-                    if(!next_valid)
+                    if (y_m[7])
                     begin
-                        if (y_m[7])
-                        begin
-                            y_m_next = y_m;
-                            y_e_next = y_e;
-                        end
-                        else
-                        begin
-                            y_m_next = y_m >> 1;
-                            y_e_next = y_e + 1'b1;
-                        end
-                        next_valid = 1'b1;
+                        y_m_next = y_m;
+                        y_e_next = y_e;
                     end
+                    else
+                    begin
+                        y_m_next = y_m >> 1;
+                        y_e_next = y_e + 1'b1;
+                    end
+                    next_state = ROUND;
+                end
+
+                ROUND:
+                begin
+                    next_valid = 1'b1;
+                    //TODO rounding
                 end
             endcase
         end

@@ -86,8 +86,9 @@ module tb;
         #1 reset = 1'b0;
         #10 assert(y_bf16 === expected_bf16 & is_output_valid_bf16) else $fatal(1, "wrong output for a %b b %b y=%b, expected %b",
                                                          a_bf16, b_bf16, y_bf16, expected_bf16);
-
-        a_bf16 = 16'hbf80;
+        
+        // TODO undestand why I need #1 after adding rounding here
+        #1 a_bf16 = 16'hbf80;
         b_bf16 = 16'hbf80;
         expected_bf16 = 16'h3f80;
         #1 reset = 1'b1;
