@@ -179,11 +179,19 @@ module float_multiplier_bf16(
 
                 NORM:
                 begin
-                    next_valid = y_m[7];
-                    if (!next_valid)
+                    if(!next_valid)
                     begin
-                        y_m_next = y_m >> 1;
-                        y_e_next = y_e + 1'b1;
+                        if (y_m[7])
+                        begin
+                            y_m_next = y_m;
+                            y_e_next = y_e;
+                        end
+                        else
+                        begin
+                            y_m_next = y_m >> 1;
+                            y_e_next = y_e + 1'b1;
+                        end
+                        next_valid = 1'b1;
                     end
                 end
             endcase
