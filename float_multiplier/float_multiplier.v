@@ -180,15 +180,15 @@ module float_multiplier_bf16(
 
                 NORM:
                 begin
-                    if (y_m[7])
-                    begin
-                        y_m_next = y_m;
-                        y_e_next = y_e;
-                    end
-                    else
+                    if (y_m[8])
                     begin
                         y_m_next = y_m >> 1;
                         y_e_next = y_e + 1'b1;
+                    end
+                    else
+                    begin
+                        y_m_next = y_m;
+                        y_e_next = y_e;
                     end
                     next_state = ROUND;
                 end
