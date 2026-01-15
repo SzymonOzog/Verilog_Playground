@@ -128,6 +128,15 @@ module float_multiplier_bf16(
 
         reg next_valid;
         reg valid;
+        reg round;
+
+        reg[7:0] m_discard;
+        wire G;
+        wire R;
+        wire S;
+        assign G = m_discard[7];
+        assign R = m_discard[6];
+        assign S = m_discard[5] | m_discard[4] | m_discard[3] | m_discard[2] | m_discard[1] | m_discard[0];
 
         parameter MUL = 2'd1;
         parameter ROUND = 2'd2;
@@ -147,6 +156,8 @@ module float_multiplier_bf16(
                 y_m_next <= 6'd0;
                 valid <= 1'b0;
                 next_valid <= 1'b0;
+                m_discard <= 8'b0;
+                round <= 1'b0;
             end
             else
             begin
@@ -171,18 +182,26 @@ module float_multiplier_bf16(
                     end
                     else 
                     begin
-                        y_m_next = y_m_mul[15] ? y_m_mul[14:8] : y_m_mul[13:7];
                         y_e_next = a_e + b_e - BIAS;
-                        y_e_next = y_m_mul[15] ? y_e_next + 1'b1 : y_e_next;
+                        if(y_m_mul[15])
+                        begin
+                            y_m_next = y_m_mul[14:8];
+                            m_discard[7:0] = y_m_mul[7:0];
+                            y_e_next = y_e_next + 1'b1;
+                        end
+                        else
+                        begin
+                            y_m_next = y_m_mul[13:7];
+                            m_discard[7:1] = y_m_mul[6:0];
+                            y_e_next = y_e_next;
+                        end
+                        round = G & (R | S | y_m_next[0]);
+                        y_m_next = y_m_next + round;
                         next_state = ROUND;
+                        next_valid = 1'b1;
                     end
                 end
 
-                ROUND:
-                begin
-                    next_valid = 1'b1;
-                    //TODO rounding
-                end
             endcase
         end
 
