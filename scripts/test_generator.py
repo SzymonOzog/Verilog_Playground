@@ -4,8 +4,8 @@ def t_to_hex(t):
     return hex(t.view(torch.int16)[0].item() & 0xFFFF)[2:]
 
 if __name__ == "__main__":
-    a_vals = [1, 0, -1, -0.75, 200]
-    b_vals = [-1, 0, -1, 1.75, 0.001]
+    a_vals = [1, 0, -1, -0.75, 200, 1.9921875]
+    b_vals = [-1, 0, -1, 1.75, 0.001, 1.75]
 
     for a, b in zip(a_vals, b_vals):
         a_t = torch.tensor([a], dtype=torch.bfloat16)
