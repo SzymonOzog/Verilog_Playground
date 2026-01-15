@@ -119,8 +119,8 @@ module float_multiplier_bf16(
         reg[7:0] y_e;
         reg[7:0] y_e_next;
 
-        reg[8:0] y_m;
-        reg[8:0] y_m_next;
+        reg[6:0] y_m;
+        reg[6:0] y_m_next;
         wire[15:0] y_m_mul;
 
         reg[1:0] curr_state;
@@ -130,8 +130,7 @@ module float_multiplier_bf16(
         reg valid;
 
         parameter MUL = 2'd1;
-        parameter NORM = 2'd2;
-        parameter ROUND = 2'd3;
+        parameter ROUND = 2'd2;
         parameter BIAS = 8'd127;
 
         assign y_m_mul = (a_m * b_m);
@@ -143,9 +142,9 @@ module float_multiplier_bf16(
                 curr_state <= MUL;
                 next_state <= MUL;
                 y_e <= 7'd0;
-                y_m <= 8'd0;
+                y_m <= 6'd0;
                 y_e_next <= 7'd0;
-                y_m_next <= 8'd0;
+                y_m_next <= 6'd0;
                 valid <= 1'b0;
                 next_valid <= 1'b0;
             end
@@ -172,25 +171,11 @@ module float_multiplier_bf16(
                     end
                     else 
                     begin
-                        y_m_next = y_m_mul[15:7];
+                        y_m_next = y_m_mul[15] ? y_m_mul[14:8] : y_m_mul[13:7];
                         y_e_next = a_e + b_e - BIAS;
-                        next_state = NORM;
+                        y_e_next = y_m_mul[15] ? y_e_next + 1'b1 : y_e_next;
+                        next_state = ROUND;
                     end
-                end
-
-                NORM:
-                begin
-                    if (y_m[8])
-                    begin
-                        y_m_next = y_m >> 1;
-                        y_e_next = y_e + 1'b1;
-                    end
-                    else
-                    begin
-                        y_m_next = y_m;
-                        y_e_next = y_e;
-                    end
-                    next_state = ROUND;
                 end
 
                 ROUND:
