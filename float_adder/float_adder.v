@@ -135,8 +135,9 @@ module float_adder_bf16(
         reg[7:0] a_e_aligned;
         reg[7:0] b_e_aligned;
 
-        wire[7:0] a_m = {1'b1, a[6:0]};
-        wire[7:0] b_m = {1'b1, b[6:0]};
+        wire[7:0] a_m = (a_e == 8'b0) ? {1'b0, a[6:0]} : {1'b1, a[6:0]};
+        wire[7:0] b_m = (b_e == 8'b0) ? {1'b0, b[6:0]} : {1'b1, b[6:0]};
+
         reg[7:0] a_m_aligned;
         reg[7:0] b_m_aligned;
 
