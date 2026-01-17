@@ -167,6 +167,8 @@ module float_adder_bf16(
         wire sub_borrow;
         wire add_carry;
 
+        reg round_up;
+
         parameter EXP = 2'd1;
         parameter NORM = 2'd2;
         assign sub_borrow = (m_sum_tmp[8] & (a[15] ^ b[15]));
@@ -232,12 +234,22 @@ module float_adder_bf16(
                     end
                     else
                     begin
-                        next_valid = m_sum[7];
+                        next_valid = m_sum[7] && !m_sum[8];
                     end
                     if (!next_valid)
                     begin
-                        m_sum_next = add_carry ? m_sum >> 1 : m_sum << 1;
-                        e_sum_next = add_carry ? e_sum + 1'b1 : e_sum - 1'b1;
+                        if (add_carry)
+                        begin
+                            round_up = m_sum[0] && m_sum[1];
+                            m_sum_next = m_sum >> 1;
+                            e_sum_next = e_sum + 1'b1;
+                            m_sum_next = round_up ? m_sum_next + 1'b1 : m_sum_next;
+                        end
+                        else
+                        begin
+                            m_sum_next = m_sum << 1;
+                            e_sum_next = e_sum - 1'b1;
+                        end
                     end
                 end
             endcase
