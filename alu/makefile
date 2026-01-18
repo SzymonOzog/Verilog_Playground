@@ -1,8 +1,8 @@
 OUT := alu.out
-SRC := $(wildcard *.v)
+SRC := $(filter-out %/tb.v,$(wildcard ../*/*.v)) tb.v
 
 run:
-	iverilog -g2012 -o $(OUT) ../float_adder/float_adder.v ../float_multiplier/float_multiplier.v -Wall $(SRC)
+	iverilog -g2012 -o $(OUT) -Wall $(SRC)
 	vvp $(OUT) 
 
 clean:
