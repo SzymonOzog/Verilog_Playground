@@ -1,24 +1,45 @@
 module processing_block(
         );
-    reg[15:0] r1_addr;
-    reg[15:0] r2_addr;
 
-    reg[15:0] write_addr;
-    reg[15:0] write_data;
+    parameter CORES=32;
+    parameter BITS=16;
+    parameter W=(CORES*BITS-1);
+
+    reg[7:0] r1_addr;
+    reg[7:0] r2_addr;
+
+    reg[7:0] write_addr;
+    reg[W:0] write_data;
     
-    wire[15:0] r1;
-    wire[15:0] r2;
+    wire[W:0] r1;
+    wire[W:0] r2;
 
     reg clock;
     reg write;
 
-    reg_file_16b r_file(r1_addr, r2_addr, write_addr, write_data, write, clock, r1, r2);
+    reg_file #(
+        .ADDR_WIDTH(8),
+        .DATA_WIDTH(16*32)
+    )_file(r1_addr, r2_addr, write_addr, write_data, write, clock, r1, r2);
 
-    wire[15:0] alu_out;
+    wire[W:0] alu_out;
+
     reg reset;
-    reg is_output_valid;
+    reg[CORES] is_output_valid;
     reg[3:0] alu_ctrl;
 
-    alu_bf16 al(r1, r2, alu_ctrl, clock, reset, alu_out, is_output_valid);
-
+    genvar i;
+    generate
+        for(i=0; i<CORES; i=i+1) begin : alus
+            alu_bf16 alu_inst (
+                .a(r1[i*BITS +: BITS]),
+                .b(r2[i*BITS +: BITS]),
+                .alu_ctrl(alu_ctrl),
+                .clock(clock),
+                .reset(reset),
+                .y(alu_out[i*BITS +: BITS]),
+                .is_output_valid(is_output_valid[i])
+            );
+        end
+    endgenerate
 endmodule
