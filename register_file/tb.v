@@ -21,8 +21,15 @@ module tb;
     reg clock;
     reg write;
 
-    reg_file r_file(r1_addr, r2_addr, write_addr, write_data, write, clock, r1_out, r2_out);
-    reg_file_16b r_file_16(r1_addr_16, r2_addr_16, write_addr_16, write_data_16, write, clock, r1_out_16, r2_out_16);
+    reg_file #(
+        .ADDR_WIDTH(8),
+        .DATA_WIDTH(8)
+    ) r_file(r1_addr, r2_addr, write_addr, write_data, write, clock, r1_out, r2_out);
+
+    reg_file #(
+        .ADDR_WIDTH(16),
+        .DATA_WIDTH(16)
+    ) r_file_16(r1_addr_16, r2_addr_16, write_addr_16, write_data_16, write, clock, r1_out_16, r2_out_16);
 
     always #1 clock = ~clock;
 
