@@ -142,10 +142,7 @@ module float_adder_bf16(
         reg[7:0] b_m_aligned;
 
         reg[7:0] y_e;
-        reg[7:0] y_e_next;
-
         reg[6:0] y_m;
-        reg[6:0] y_m_next;
 
         reg[8:0] diff;
 
@@ -168,95 +165,71 @@ module float_adder_bf16(
         wire add_carry;
 
         reg round_up;
+        reg[3:0] lzd;
 
         parameter EXP = 2'd1;
         parameter NORM = 2'd2;
         assign sub_borrow = (m_sum_tmp[8] & (a[15] ^ b[15]));
         assign add_carry = m_sum[8] & !(a[15] ^ b[15]);
 
-        always @ (posedge clock or posedge reset)
+        always @ (*)
         begin
-            if (reset)
+            diff = a_e - b_e;
+            if (diff[8]) begin
+                shift_amt = ~(diff[7:0]) + 1'b1;
+                a_m_aligned = a_m >> shift_amt;
+                a_e_aligned = a_e + shift_amt;
+                b_m_aligned = b_m;
+                b_e_aligned = b_e;
+                e_sum = b_e;
+            end 
+            else
             begin
-                curr_state <= EXP;
-                m_sum <= 8'd0;
-                e_sum <= 7'd0;
-                valid <= 1'b0;
-                next_valid <= 1'b0;
+                shift_amt = diff[7:0];
+                a_m_aligned = a_m;
+                a_e_aligned = a_e;
+                b_m_aligned = b_m >> shift_amt;
+                b_e_aligned = b_e + shift_amt;
+                e_sum = a_e;
+            end
+            m_sum_tmp = !(a[15] ^ b[15]) ? a_m_aligned + b_m_aligned :
+                        a[15]           ? b_m_aligned - a_m_aligned : 
+                                         a_m_aligned - b_m_aligned ;
+                               
+            m_sum = sub_borrow ? ~(m_sum_tmp) + 1'b1 : m_sum_tmp;
+            //by default setting this to 1 does nothing
+            lzd = 4'd1;
+            if (m_sum[8])      lzd = 4'd0;
+            else if (m_sum[7]) lzd = 4'd1;
+            else if (m_sum[6]) lzd = 4'd2;
+            else if (m_sum[5]) lzd = 4'd3;
+            else if (m_sum[4]) lzd = 4'd4;
+            else if (m_sum[3]) lzd = 4'd5;
+            else if (m_sum[2]) lzd = 4'd6;
+            else if (m_sum[1]) lzd = 4'd7;
+            else if (m_sum[0]) lzd = 4'd8;
+
+            if (m_sum == 8'd0)
+            begin
+                e_sum = 8'd0;
+            end
+
+            round_up = m_sum[0] && m_sum[1];
+            if (lzd == 4'd0)
+            begin
+                m_sum = m_sum >> 1;
+                e_sum = e_sum + 1;
             end
             else
             begin
-                curr_state <= next_state;
-                m_sum <= m_sum_next;
-                e_sum <= e_sum_next;
-                valid <= next_valid;
+                m_sum = m_sum << (lzd-1);
+                e_sum = e_sum - (lzd-1);
             end
-        end
-
-        always @ (*)
-        begin
-            case(curr_state)
-                EXP:
-                begin
-                    diff = a_e - b_e;
-                    if (diff[8]) begin
-                        shift_amt = ~(diff[7:0]) + 1'b1;
-                        a_m_aligned = a_m >> shift_amt;
-                        a_e_aligned = a_e + shift_amt;
-                        b_m_aligned = b_m;
-                        b_e_aligned = b_e;
-                        e_sum_next = b_e;
-                    end 
-                    else
-                    begin
-                        shift_amt = diff[7:0];
-                        a_m_aligned = a_m;
-                        a_e_aligned = a_e;
-                        b_m_aligned = b_m >> shift_amt;
-                        b_e_aligned = b_e + shift_amt;
-                        e_sum_next = a_e;
-                    end
-                    m_sum_tmp = !(a[15] ^ b[15]) ? a_m_aligned + b_m_aligned :
-                                a[15]           ? b_m_aligned - a_m_aligned : 
-                                                 a_m_aligned - b_m_aligned ;
-                                       
-                    m_sum_next = sub_borrow ? ~(m_sum_tmp) + 1'b1 : m_sum_tmp;
-                    next_state = NORM;
-                end
-
-                NORM:
-                begin
-                    //TODO is there a smarter way to do this
-                    if (m_sum == 8'd0)
-                    begin
-                        next_valid = 1'b1;
-                        e_sum_next = 8'd0;
-                    end
-                    else
-                    begin
-                        next_valid = m_sum[7] && !m_sum[8];
-                    end
-                    if (!next_valid)
-                    begin
-                        if (add_carry)
-                        begin
-                            round_up = m_sum[0] && m_sum[1];
-                            m_sum_next = m_sum >> 1;
-                            e_sum_next = e_sum + 1'b1;
-                            m_sum_next = round_up ? m_sum_next + 1'b1 : m_sum_next;
-                        end
-                        else
-                        begin
-                            m_sum_next = m_sum << 1;
-                            e_sum_next = e_sum - 1'b1;
-                        end
-                    end
-                end
-            endcase
+            m_sum = round_up ? m_sum + 1'b1 : m_sum;
         end
 
         assign y[15] = (a[15] & b[15]) || sub_borrow;
         assign y[14:7] = e_sum;
         assign y[6:0] = m_sum[6:0];
-        assign is_output_valid = valid;
+        assign is_output_valid = 1'b1;
 endmodule
