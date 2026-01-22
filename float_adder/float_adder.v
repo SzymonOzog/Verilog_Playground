@@ -2,9 +2,7 @@ module float_adder_e4m3(
         input wire[7:0] a,
         input wire[7:0] b,
         input wire clock,
-        input wire reset,
-        output wire[7:0] y,
-        output wire is_output_valid
+        output wire[7:0] y
         );
 
         wire a_s = a[7];
@@ -92,16 +90,13 @@ module float_adder_e4m3(
         assign y[7] = (a_s & b_s) || sub_borrow;
         assign y[6:3] = e_sum;
         assign y[2:0] = m_sum[2:0];
-        assign is_output_valid = 1'b1;
 endmodule
 
 module float_adder_bf16(
         input wire[15:0] a,
         input wire[15:0] b,
         input wire clock,
-        input wire reset,
-        output wire[15:0] y,
-        output wire is_output_valid
+        output wire[15:0] y
         );
 
         wire a_s = a[15];
@@ -193,5 +188,4 @@ module float_adder_bf16(
         assign y[15] = (a_s & b_s) || sub_borrow;
         assign y[14:7] = e_sum;
         assign y[6:0] = m_sum[6:0];
-        assign is_output_valid = 1'b1;
 endmodule

@@ -24,8 +24,6 @@ module processing_block(
 
     wire[W:0] alu_out;
 
-    reg reset;
-    reg[CORES] is_output_valid;
     reg[3:0] alu_ctrl;
 
     genvar i;
@@ -36,9 +34,7 @@ module processing_block(
                 .b(r2[i*BITS +: BITS]),
                 .alu_ctrl(alu_ctrl),
                 .clock(clock),
-                .reset(reset),
-                .y(alu_out[i*BITS +: BITS]),
-                .is_output_valid(is_output_valid[i])
+                .y(alu_out[i*BITS +: BITS])
             );
         end
     endgenerate
