@@ -13,89 +13,59 @@ module float_multiplier_e4m3(
         wire[3:0] a_e = a[6:3];
         wire[3:0] b_e = b[6:3];
 
-
         wire[3:0] a_m = {1'b1, a[2:0]};
         wire[3:0] b_m = {1'b1, b[2:0]};
 
-        reg[4:0] y_e;
-        reg[4:0] y_e_next;
-
-        reg[4:0] y_m;
-        reg[4:0] y_m_next;
+        reg[3:0] y_e;
+        reg[2:0] y_m;
         wire[7:0] y_m_mul;
 
-        reg[1:0] curr_state;
-        reg[1:0] next_state;
+        reg[3:0] m_discard;
+        reg round;
+        wire G;
+        wire R;
+        wire S;
+        assign G = m_discard[3];
+        assign R = m_discard[2];
+        assign S = m_discard[1] | m_discard[0];
 
-        reg next_valid;
-        reg valid;
-
-        parameter MUL = 2'd1;
-        parameter NORM = 2'd2;
         parameter BIAS = 4'd7;
 
         assign y_m_mul = (a_m * b_m);
 
-        always @ (posedge clock or posedge reset)
-        begin
-            if (reset)
-            begin
-                curr_state <= MUL;
-                next_state <= MUL;
-                y_e <= 5'd0;
-                y_m <= 5'd0;
-                y_e_next <= 5'd0;
-                y_m_next <= 5'd0;
-                valid <= 1'b0;
-                next_valid <= 1'b0;
-            end
-            else
-            begin
-                curr_state <= next_state;
-                y_m <= y_m_next;
-                y_e <= y_e_next;
-                valid <= next_valid;
-            end
-        end
-
         always @ (*)
         begin
-            case(curr_state)
-                MUL:
+            if (a[6:0] == 7'b0 || b[6:0] == 7'b0)
+            begin
+                y_e = 4'd0;
+                y_m = 3'd0;
+                m_discard = 4'd0;
+            end
+            else 
+            begin
+                y_e = a_e + b_e - BIAS;
+                if(y_m_mul[7])
                 begin
-                    if (a == 8'b00000000 || 
-                        a == 8'b10000000 || 
-                        b == 8'b00000000 || 
-                        b == 8'b10000000 )
-                    begin
-                        y_e_next = 5'd0;
-                        y_m_next = 5'd0;
-                        next_valid = 1'b1;
-                    end
-                    else 
-                    begin
-                        y_m_next = y_m_mul[7:3];
-                        y_e_next = a_e + b_e - BIAS;
-                        next_state = NORM;
-                    end
+                    y_m = y_m_mul[6:4];
+                    m_discard[3:0] = y_m_mul[3:0];
+                    y_e = y_e + 1'b1;
                 end
-
-                NORM:
+                else
                 begin
-                    next_valid = y_m[3];
-                    if (!next_valid)
-                    begin
-                        y_m_next = y_m >> 1;
-                        y_e_next = y_e + 1'b1;
-                    end
+                    y_m = y_m_mul[5:3];
+                    m_discard[3:1] = y_m_mul[2:0];
+                    m_discard[0] = 1'b0;
+                    y_e = y_e;
                 end
-            endcase
+                round = G & (R | S | y_m[0]);
+                y_m = y_m + round;
+            end
         end
 
         assign y[7] = a_s ^ b_s;
         assign y[6:3] = y_e;
         assign y[2:0] = y_m[2:0];
-        assign is_output_valid = valid;
+        assign is_output_valid = 1'b1;
 endmodule
 
 module float_multiplier_bf16(
