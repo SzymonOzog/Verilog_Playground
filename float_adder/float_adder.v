@@ -129,6 +129,9 @@ module float_adder_bf16(
         output wire is_output_valid
         );
 
+        wire a_s = a[15];
+        wire b_s = b[15];
+
         wire[7:0] a_e = a[14:7];
         wire[7:0] b_e = b[14:7];
 
@@ -147,30 +150,17 @@ module float_adder_bf16(
         reg[8:0] diff;
 
         reg[7:0] shift_amt;
-        reg sub_sign_change;
 
-        reg[8:0] m_sum_tmp;
         reg[8:0] m_sum;
-        reg[8:0] m_sum_next;
-
         reg[7:0] e_sum;
-        reg[7:0] e_sum_next;
-
-        reg[1:0] curr_state;
-        reg[1:0] next_state;
-        reg next_valid;
-        reg valid;
-
-        wire sub_borrow;
-        wire add_carry;
 
         reg round_up;
         reg[3:0] lzd;
 
-        parameter EXP = 2'd1;
-        parameter NORM = 2'd2;
-        assign sub_borrow = (m_sum_tmp[8] & (a[15] ^ b[15]));
-        assign add_carry = m_sum[8] & !(a[15] ^ b[15]);
+        wire sub_borrow = (m_sum_tmp[8] & (a_s ^ b_s));
+        wire[8:0] m_sum_tmp = !(a_s ^ b_s) ? a_m_aligned + b_m_aligned :
+                             a_s            ? b_m_aligned - a_m_aligned : 
+                                                a_m_aligned - b_m_aligned;
 
         always @ (*)
         begin
@@ -192,9 +182,6 @@ module float_adder_bf16(
                 b_e_aligned = b_e + shift_amt;
                 e_sum = a_e;
             end
-            m_sum_tmp = !(a[15] ^ b[15]) ? a_m_aligned + b_m_aligned :
-                        a[15]           ? b_m_aligned - a_m_aligned : 
-                                         a_m_aligned - b_m_aligned ;
                                
             m_sum = sub_borrow ? ~(m_sum_tmp) + 1'b1 : m_sum_tmp;
             //by default setting this to 1 does nothing
@@ -228,7 +215,7 @@ module float_adder_bf16(
             m_sum = round_up ? m_sum + 1'b1 : m_sum;
         end
 
-        assign y[15] = (a[15] & b[15]) || sub_borrow;
+        assign y[15] = (a_s & b_s) || sub_borrow;
         assign y[14:7] = e_sum;
         assign y[6:0] = m_sum[6:0];
         assign is_output_valid = 1'b1;
