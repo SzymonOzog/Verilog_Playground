@@ -1,16 +1,20 @@
 module processing_block(
+    input wire[31:0] instructions[65535]
         );
 
     parameter CORES=32;
     parameter BITS=16;
     parameter W=(CORES*BITS-1);
 
-    reg[7:0] r1_addr;
-    reg[7:0] r2_addr;
+    reg[15:0] instruction_ptr = 16'd0;
+    wire[31:0] curr_instr = instructions[instruction_ptr];
 
-    reg[7:0] write_addr;
+    wire[3:0] alu_ctrl = curr_instr[27:24];
+    wire[7:0] write_addr = curr_instr[23:16];
+    wire[7:0] r1_addr = curr_instr[15:8];
+    wire[7:0] r2_addr = curr_instr[7:0];
+
     reg[W:0] write_data;
-    
     wire[W:0] r1;
     wire[W:0] r2;
 
@@ -24,7 +28,6 @@ module processing_block(
 
     wire[W:0] alu_out;
 
-    reg[3:0] alu_ctrl;
 
     genvar i;
     generate
@@ -38,4 +41,8 @@ module processing_block(
             );
         end
     endgenerate
+
+    always @ (posedge clock) begin
+        instruction_ptr = instruction_ptr + 1;
+    end
 endmodule
