@@ -20,7 +20,7 @@ module processing_block(
     reg_file #(
         .ADDR_WIDTH(8),
         .DATA_WIDTH(16*32)
-    )_file(r1_addr, r2_addr, write_addr, write_data, write, clock, r1, r2);
+    ) r_file(r1_addr, r2_addr, write_addr, write_data, write, clock, r1, r2);
 
     wire[W:0] alu_out;
 
