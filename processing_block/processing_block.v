@@ -1,32 +1,49 @@
-module processing_block(
-    input wire[31:0] instructions[65535]
-        );
 
-    parameter CORES=32;
-    parameter BITS=16;
-    parameter W=(CORES*BITS-1);
+module processing_block #(
+    parameter CORES=32,
+    parameter BITS=16,
+    localparam W=(CORES*BITS-1)
+)(
+    input wire[31:0] instructions[65535],
+    input wire[W:0] load_data,
+    output wire[15:0] load_addr,
+    output wire[15:0] write_addr_main,
+    output wire[W:0] write_data_main,
+    output wire load_ctrl,
+    output wire write_ctrl
+        );
 
     reg[15:0] instruction_ptr = 16'd0;
     wire[31:0] curr_instr = instructions[instruction_ptr];
 
+    wire[3:0] instr_op = curr_instr[31:28];
     wire[3:0] alu_ctrl = curr_instr[27:24];
-    wire[7:0] write_addr = curr_instr[23:16];
+    wire[7:0] write_addr_reg = curr_instr[23:16];
     wire[7:0] r1_addr = curr_instr[15:8];
     wire[7:0] r2_addr = curr_instr[7:0];
 
-    reg[W:0] write_data;
     wire[W:0] r1;
     wire[W:0] r2;
 
     reg clock;
-    reg write;
+
+    wire alu_op = instr_op == 4'd0;
+    wire write_op = instr_op == 4'd1;
+    wire load_op = instr_op == 4'd2;
+
+    wire[W:0] alu_out;
+    wire write_reg = alu_op | load_op;
+
+    assign load_ctrl = load_op;
+    assign write_ctrl = write_op;
+    
+    wire[W:0] write_data_reg = load_op ? load_data :
+                               alu_op  ? alu_out : 0;
 
     reg_file #(
         .ADDR_WIDTH(8),
-        .DATA_WIDTH(16*32)
-    ) r_file(r1_addr, r2_addr, write_addr, write_data, write, clock, r1, r2);
-
-    wire[W:0] alu_out;
+        .DATA_WIDTH(BITS*CORES)
+    ) r_file(r1_addr, r2_addr, write_addr_reg, write_data_reg, write_reg, clock, r1, r2);
 
 
     genvar i;
