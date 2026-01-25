@@ -6,6 +6,7 @@ module processing_block #(
 )(
     input wire[31:0] instructions[65535],
     input wire[W:0] load_data,
+    input wire clock,
     output wire[15:0] load_addr,
     output wire[15:0] write_addr_main,
     output wire[W:0] write_data_main,
@@ -24,8 +25,6 @@ module processing_block #(
 
     wire[W:0] r1;
     wire[W:0] r2;
-
-    reg clock;
 
     wire alu_op = instr_op == 4'd0;
     wire write_op = instr_op == 4'd1;
