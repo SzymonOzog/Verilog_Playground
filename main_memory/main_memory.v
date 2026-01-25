@@ -1,5 +1,5 @@
 module main_memory #(
-    parameter ADDR_WIDTH = 32,
+    parameter ADDR_WIDTH = 16,
     parameter DATA_WIDTH = 16 
 )(
     input wire [ADDR_WIDTH-1:0] read_addr,
