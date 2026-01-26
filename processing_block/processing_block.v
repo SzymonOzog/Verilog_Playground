@@ -15,13 +15,14 @@ module processing_block #(
         );
 
     reg[15:0] instruction_ptr = 16'd0;
-    wire[31:0] curr_instr = instructions[instruction_ptr];
+    reg[31:0] curr_instr;
 
     wire[3:0] instr_op = curr_instr[31:28];
     wire[3:0] alu_ctrl = curr_instr[27:24];
     wire[7:0] write_addr_reg = curr_instr[23:16];
     wire[7:0] r1_addr = curr_instr[15:8];
     wire[7:0] r2_addr = curr_instr[7:0];
+    assign load_addr = curr_instr[15:0];
 
     wire[W:0] r1;
     wire[W:0] r2;
@@ -59,6 +60,7 @@ module processing_block #(
     endgenerate
 
     always @ (posedge clock) begin
+        curr_instr = instructions[instruction_ptr];
         instruction_ptr = instruction_ptr + 1;
     end
 endmodule
