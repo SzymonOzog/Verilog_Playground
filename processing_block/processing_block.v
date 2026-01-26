@@ -19,21 +19,23 @@ module processing_block #(
 
     wire[3:0] instr_op = curr_instr[31:28];
     wire[3:0] alu_ctrl = curr_instr[27:24];
-    wire[7:0] write_addr_reg = curr_instr[23:16];
-    wire[7:0] r1_addr = curr_instr[15:8];
-    wire[7:0] r2_addr = curr_instr[7:0];
-    assign load_addr = curr_instr[15:0];
-
-    wire[W:0] r1;
-    wire[W:0] r2;
 
     wire alu_op = instr_op == 4'd0;
     wire write_op = instr_op == 4'd1;
     wire load_op = instr_op == 4'd2;
 
+    wire[7:0] write_addr_reg = curr_instr[23:16];
+    wire[7:0] r1_addr = write_op ? curr_instr[23:16] : curr_instr[15:8];
+    wire[7:0] r2_addr = curr_instr[7:0];
+
+    wire[W:0] r1;
+    wire[W:0] r2;
     wire[W:0] alu_out;
     wire write_reg = alu_op | load_op;
 
+    assign load_addr = curr_instr[15:0];
+    assign write_addr_main = curr_instr[15:0];
+    assign write_data_main = r1;
     assign load_ctrl = load_op;
     assign write_ctrl = write_op;
     
@@ -44,7 +46,6 @@ module processing_block #(
         .ADDR_WIDTH(8),
         .DATA_WIDTH(BITS*CORES)
     ) r_file(r1_addr, r2_addr, write_addr_reg, write_data_reg, write_reg, clock, r1, r2);
-
 
     genvar i;
     generate
@@ -61,6 +62,8 @@ module processing_block #(
 
     always @ (posedge clock) begin
         curr_instr = instructions[instruction_ptr];
+    end
+    always @ (negedge clock) begin
         instruction_ptr = instruction_ptr + 1;
     end
 endmodule

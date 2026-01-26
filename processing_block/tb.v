@@ -31,23 +31,37 @@ module tb;
         instructions[2][23:16] = 8'd2;
         instructions[2][15:0] = 16'd2;
         // Multiply register 0 * register 1 store in register 3
-        instructions[2][31:24] = 8'b00000010;
-        instructions[2][23:16] = 8'd3;
-        instructions[2][15:8] = 8'd0;
-        instructions[2][7:0] = 8'd1;
+        instructions[3][31:24] = 8'b00000010;
+        instructions[3][23:16] = 8'd3;
+        instructions[3][15:8] = 8'd0;
+        instructions[3][7:0] = 8'd1;
         // Add register 2 to register 3 store in register 4
-        instructions[3][31:24] = 8'b00000001;
-        instructions[3][23:16] = 8'd4;
-        instructions[3][15:8] = 8'd3;
-        instructions[3][7:0] = 8'd2;
-        // Write register 4 to main mem
-        instructions[4][31:24] = 8'b00010000;
+        instructions[4][31:24] = 8'b00000001;
         instructions[4][23:16] = 8'd4;
-        instructions[4][15:0] = 16'd1;
+        instructions[4][15:8] = 8'd3;
+        instructions[4][7:0] = 8'd2;
+        // Write register 4 to main mem 3
+        instructions[5][31:24] = 8'b00010000;
+        instructions[5][23:16] = 8'd4;
+        instructions[5][15:0] = 16'd3;
         clock = 1'b1;
 
-        #1 assert(load_addr === 16'd0) else $fatal(1, "wrong load addr expected %b, got %b", 
+        #1 assert(load_addr === 16'd0 & load_ctrl) else $fatal(1, "wrong load addr expected %b, got %b", 
             16'd0, load_addr);
+        //TODO test on actual data
+        load_data = 512'd0;
+        #2 assert(load_addr === 16'd1 & load_ctrl) else $fatal(1, "wrong load addr expected %b, got %b", 
+            16'd1, load_addr);
+
+        load_data = 512'd0;
+        #2 assert(load_addr === 16'd2 & load_ctrl) else $fatal(1, "wrong load addr expected %b, got %b", 
+            16'd2, load_addr);
+        load_data = 512'd0;
+
+
+        #6 assert(write_addr === 16'd3 & write_ctrl & write_data == 512'd0) else 
+            $fatal(1, "wrong write addr expected %b, got %b, data expected %d got %d", 
+            16'd3, load_addr, write_data, 512'd0);
 
         $display("All test passed");
         $finish;
