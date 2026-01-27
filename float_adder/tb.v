@@ -97,6 +97,19 @@ module tb;
         #10 assert(y_bf16 === expected_bf16) else $fatal(1, "wrong output for a %b b %b y=%b, expected %b",
                                                          a_bf16, b_bf16, y_bf16, expected_bf16);
 
+        //TODO: Should we care about this
+        // a_bf16 = 16'h0000;
+        // b_bf16 = 16'h8000;
+        // expected_bf16 = 16'h8000;
+        // #10 assert(y_bf16 === expected_bf16) else $fatal(1, "wrong output for a %b b %b y=%b, expected %b",
+        //                                                  a_bf16, b_bf16, y_bf16, expected_bf16);
+
+        //TODO: This should pass
+        // a_bf16 = 16'h0000;
+        // b_bf16 = 16'hC033;
+        // expected_bf16 = 16'hC033;
+        // #10 assert(y_bf16 === expected_bf16) else $fatal(1, "wrong output for a %b b %b y=%b, expected %b",
+        //                                                  a_bf16, b_bf16, y_bf16, expected_bf16);
         $display("All test passed");
         $finish;
     end
