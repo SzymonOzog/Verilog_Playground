@@ -46,6 +46,7 @@ module processing_block #(
         .ADDR_WIDTH(8),
         .DATA_WIDTH(BITS*CORES)
     ) r_file(r1_addr, r2_addr, write_addr_reg, write_data_reg, write_reg, clock, r1, r2);
+    reg pipeline_stage;
 
     genvar i;
     generate
@@ -64,6 +65,15 @@ module processing_block #(
         curr_instr = instructions[instruction_ptr];
     end
     always @ (negedge clock) begin
-        instruction_ptr = instruction_ptr + 1;
+        if (pipeline_stage)
+        begin
+            instruction_ptr = instruction_ptr + 1;
+            pipeline_stage = 1'b0;
+        end
+        else
+        begin
+            pipeline_stage = 1'b1;
+        end
+        curr_instr = instructions[instruction_ptr];
     end
 endmodule
