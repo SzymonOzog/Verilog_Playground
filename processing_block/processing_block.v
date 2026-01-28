@@ -22,6 +22,7 @@ module processing_block #(
     wire alu_op = instr_op == 4'd0;
     wire write_op = instr_op == 4'd1;
     wire load_op = instr_op == 4'd2;
+    wire mov_op = instr_op == 4'd3;
 
     wire[7:0] write_addr_reg = curr_instr[23:16];
     wire[7:0] r1_addr = write_op ? curr_instr[23:16] : curr_instr[15:8];
@@ -30,7 +31,7 @@ module processing_block #(
     wire[W:0] r1;
     wire[W:0] r2;
     wire[W:0] alu_out;
-    wire write_reg = alu_op | load_op;
+    wire write_reg = alu_op | load_op | mov_op;
 
     assign load_addr = curr_instr[15:0];
     assign write_addr_main = curr_instr[15:0];
@@ -39,7 +40,8 @@ module processing_block #(
     assign write_ctrl = write_op;
 
     wire[W:0] write_data_reg = load_op ? load_data :
-                               alu_op  ? alu_out : 0;
+                               alu_op  ? alu_out :
+                               mov_op  ? {32{curr_instr[15:0]}} : 0;
 
     reg_file #(
         .ADDR_WIDTH(8),

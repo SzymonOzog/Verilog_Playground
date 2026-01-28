@@ -29,10 +29,10 @@ module tb;
         instructions[1][31:24] = 8'b00100000;
         instructions[1][23:16] = 8'd1;
         instructions[1][15:0] = 16'd1;
-        // Load from main mem 2 to register 2
-        instructions[2][31:24] = 8'b00100000;
+        // Mov 0x3e4d to register 2
+        instructions[2][31:24] = 8'b00110000;
         instructions[2][23:16] = 8'd2;
-        instructions[2][15:0] = 16'd2;
+        instructions[2][15:0] = 16'h3e4d;
         // Multiply register 0 * register 1 store in register 3
         instructions[3][31:24] = 8'b00000010;
         instructions[3][23:16] = 8'd3;
@@ -55,16 +55,12 @@ module tb;
 
         #4 assert(load_addr === 16'd1 & load_ctrl) else $fatal(1, "wrong load addr expected %b, got %b",
             16'd1, load_addr);
-        load_data = 512'd0;
         load_data = 512'h40004000400040004000400040004000400040004000400040004000400040004000400040004000400040004000400040004000400040004000400040004000;
 
-        #4 assert(load_addr === 16'd2 & load_ctrl) else $fatal(1, "wrong load addr expected %b, got %b",
-            16'd2, load_addr);
-        load_data = 512'h3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d;
+        #4 assert(!load_ctrl) else $fatal(1, "Load ctrl during mov should be disabled");
         expected = 512'h3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a;
 
-
-        #12 assert(write_addr === 16'd3 & write_ctrl ) else
+        #12 assert(write_addr === 16'd3 & write_ctrl) else
             $fatal(1, "wrong write addr expected %b, got %b", 16'd3, load_addr);
 
         for(i=0; i<32; i=i+1) begin
