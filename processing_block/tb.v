@@ -1,5 +1,5 @@
 module tb;
-    localparam W = 32*16-1;
+    localparam int W = 32*16-1;
     reg[31:0] instructions[65535];
     reg[W:0] load_data;
     reg clock;
@@ -49,27 +49,27 @@ module tb;
         instructions[5][15:0] = 16'd3;
         clock = 1'b1;
 
-        #1 assert(load_addr === 16'd0 & load_ctrl) else $fatal(1, "wrong load addr expected %b, got %b", 
+        #1 assert(load_addr === 16'd0 & load_ctrl) else $fatal(1, "wrong load addr expected %b, got %b",
             16'd0, load_addr);
         load_data = 512'h3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d;
 
-        #4 assert(load_addr === 16'd1 & load_ctrl) else $fatal(1, "wrong load addr expected %b, got %b", 
+        #4 assert(load_addr === 16'd1 & load_ctrl) else $fatal(1, "wrong load addr expected %b, got %b",
             16'd1, load_addr);
         load_data = 512'd0;
         load_data = 512'h40004000400040004000400040004000400040004000400040004000400040004000400040004000400040004000400040004000400040004000400040004000;
 
-        #4 assert(load_addr === 16'd2 & load_ctrl) else $fatal(1, "wrong load addr expected %b, got %b", 
+        #4 assert(load_addr === 16'd2 & load_ctrl) else $fatal(1, "wrong load addr expected %b, got %b",
             16'd2, load_addr);
         load_data = 512'h3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d;
         expected = 512'h3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a;
 
 
-        #12 assert(write_addr === 16'd3 & write_ctrl ) else 
+        #12 assert(write_addr === 16'd3 & write_ctrl ) else
             $fatal(1, "wrong write addr expected %b, got %b", 16'd3, load_addr);
 
         for(i=0; i<32; i=i+1) begin
-            assert(write_data[i*16 +: 16] == expected[i*16 +: 16]) else 
-                $fatal(1, "wrong output of alu %d, expected %x got %x", 
+            assert(write_data[i*16 +: 16] == expected[i*16 +: 16]) else
+                $fatal(1, "wrong output of alu %d, expected %x got %x",
                 i, expected[i*16 +: 16], write_data[i*16 +: 16]);
         end
 

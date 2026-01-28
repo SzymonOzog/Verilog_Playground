@@ -1,8 +1,7 @@
-
 module processing_block #(
-    parameter CORES=32,
-    parameter BITS=16,
-    localparam W=(CORES*BITS-1)
+    parameter int CORES=32,
+    parameter int BITS=16,
+    localparam int W=(CORES*BITS-1)
 )(
     input wire[31:0] instructions[65535],
     input wire[W:0] load_data,
@@ -38,7 +37,7 @@ module processing_block #(
     assign write_data_main = r1;
     assign load_ctrl = load_op;
     assign write_ctrl = write_op;
-    
+
     wire[W:0] write_data_reg = load_op ? load_data :
                                alu_op  ? alu_out : 0;
 
@@ -50,7 +49,7 @@ module processing_block #(
 
     genvar i;
     generate
-        for(i=0; i<CORES; i=i+1) begin : alus
+        for(i=0; i<CORES; i=i+1) begin : g_alus
             alu_bf16 alu_inst (
                 .a(r1[i*BITS +: BITS]),
                 .b(r2[i*BITS +: BITS]),
