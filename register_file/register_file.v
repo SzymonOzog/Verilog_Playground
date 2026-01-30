@@ -16,7 +16,7 @@ module reg_file #(
 
     reg [DATA_WIDTH-1:0] r1_out_reg;
     reg [DATA_WIDTH-1:0] r2_out_reg;
-    reg [DATA_WIDTH-1:0] registers [CAP-1];
+    reg [DATA_WIDTH-1:0] registers [CAP];
 
     assign r1_out = r1_out_reg;
     assign r2_out = r2_out_reg;
