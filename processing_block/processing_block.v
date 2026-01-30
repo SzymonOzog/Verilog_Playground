@@ -36,7 +36,7 @@ module processing_block #(
     wire write_reg = alu_op | load_op | mov_op;
 
     assign load_addr = r1[15:0];
-    assign write_addr_main = curr_instr[15:0];
+    assign write_addr_main = r2[15:0];
     assign write_data_main = r1;
     assign load_ctrl = load_op;
     assign write_ctrl = write_op;

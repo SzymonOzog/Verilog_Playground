@@ -27,44 +27,48 @@ module tb;
         instructions[0][31:24] = 8'b00110000;
         instructions[0][23:16] = 8'd8;
         instructions[0][15:0] = 16'd0;
-        // Mov 0 to register 8
+        // Mov 1 to register 9
         instructions[1][31:24] = 8'b00110000;
         instructions[1][23:16] = 8'd9;
         instructions[1][15:0] = 16'd1;
+        // Mov 3 to register 8
+        instructions[2][31:24] = 8'b00110000;
+        instructions[2][23:16] = 8'd10;
+        instructions[2][15:0] = 16'd3;
         // Load from main mem &r8 to register 0
-        instructions[2][31:24] = 8'b00100000;
-        instructions[2][23:16] = 8'd0;
-        instructions[2][15:8] = 8'd8;
-        // Load from main mem &r9 to register 1
         instructions[3][31:24] = 8'b00100000;
-        instructions[3][23:16] = 8'd1;
-        instructions[3][15:8] = 8'd9;
+        instructions[3][23:16] = 8'd0;
+        instructions[3][15:8] = 8'd8;
+        // Load from main mem &r9 to register 1
+        instructions[4][31:24] = 8'b00100000;
+        instructions[4][23:16] = 8'd1;
+        instructions[4][15:8] = 8'd9;
         // Mov 0x3e4d to register 2
-        instructions[4][31:24] = 8'b00110000;
-        instructions[4][23:16] = 8'd2;
-        instructions[4][15:0] = 16'h3e4d;
+        instructions[5][31:24] = 8'b00110000;
+        instructions[5][23:16] = 8'd2;
+        instructions[5][15:0] = 16'h3e4d;
         // Multiply register 0 * register 1 store in register 3
-        instructions[5][31:24] = 8'b00000010;
-        instructions[5][23:16] = 8'd3;
-        instructions[5][15:8] = 8'd0;
-        instructions[5][7:0] = 8'd1;
+        instructions[6][31:24] = 8'b00000010;
+        instructions[6][23:16] = 8'd3;
+        instructions[6][15:8] = 8'd0;
+        instructions[6][7:0] = 8'd1;
         // Add register 2 to register 3 store in register 4
-        instructions[6][31:24] = 8'b00000001;
-        instructions[6][23:16] = 8'd4;
-        instructions[6][15:8] = 8'd3;
-        instructions[6][7:0] = 8'd2;
-        // Write register 4 to main mem 3
-        instructions[7][31:24] = 8'b00010000;
+        instructions[7][31:24] = 8'b00000001;
         instructions[7][23:16] = 8'd4;
-        instructions[7][15:0] = 16'd3;
+        instructions[7][15:8] = 8'd3;
+        instructions[7][7:0] = 8'd2;
+        // Write register 4 to main mem 3
+        instructions[8][31:24] = 8'b00010000;
+        instructions[8][23:16] = 8'd4;
+        instructions[8][7:0] = 8'd10;
 
         // end program
-        instructions[8] = 32'd0;
+        instructions[9] = 32'd0;
 
         clock = 1'b1;
         reset = 1'b0;
 
-        #9 assert(load_addr === 16'd0 & load_ctrl) else $fatal(1, "wrong load addr expected %b, got %b",
+        #13 assert(load_addr === 16'd0 & load_ctrl) else $fatal(1, "wrong load addr expected %b, got %b",
             16'd0, load_addr);
         load_data = 512'h3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d;
 
@@ -89,7 +93,7 @@ module tb;
         #clock reset = 1'b1;
         #(!clock) reset = 1'b0;
 
-        #8 assert(load_addr === 16'd0 & load_ctrl) else $fatal(1, "wrong load addr expected %b, got %b",
+        #12 assert(load_addr === 16'd0 & load_ctrl) else $fatal(1, "wrong load addr expected %b, got %b",
             16'd0, load_addr);
         load_data = 512'h3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d;
 
