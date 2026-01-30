@@ -6,11 +6,13 @@ module processing_block #(
     input wire[31:0] instructions[65535],
     input wire[W:0] load_data,
     input wire clock,
+    input wire reset,
     output wire[15:0] load_addr,
     output wire[15:0] write_addr_main,
     output wire[W:0] write_data_main,
     output wire load_ctrl,
-    output wire write_ctrl
+    output wire write_ctrl,
+    output wire finished
         );
 
     reg[15:0] instruction_ptr = 16'd0;
@@ -49,6 +51,8 @@ module processing_block #(
     ) r_file(r1_addr, r2_addr, write_addr_reg, write_data_reg, write_reg, clock, r1, r2);
     reg pipeline_stage;
 
+    assign finished = (curr_instr == 32'd0);
+
     genvar i;
     generate
         for(i=0; i<CORES; i=i+1) begin : g_alus
@@ -63,10 +67,15 @@ module processing_block #(
     endgenerate
 
     always @ (posedge clock) begin
+        if (reset) begin
+            instruction_ptr = 16'd0;
+            pipeline_stage = 1'b0;
+        end
         curr_instr = instructions[instruction_ptr];
     end
+
     always @ (negedge clock) begin
-        if (pipeline_stage)
+        if (pipeline_stage & !finished)
         begin
             instruction_ptr = instruction_ptr + 1;
             pipeline_stage = 1'b0;

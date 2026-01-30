@@ -9,12 +9,14 @@ module tb;
     wire load_ctrl;
     wire write_ctrl;
     reg[W:0] expected;
+    reg reset;
+    wire finished;
 
     int i;
 
     processing_block pb(instructions,
-        load_data, clock, load_addr,
-        write_addr, write_data, load_ctrl, write_ctrl);
+        load_data, clock, reset, load_addr,
+        write_addr, write_data, load_ctrl, write_ctrl, finished);
 
     always #1 clock = ~clock;
 
@@ -47,7 +49,12 @@ module tb;
         instructions[5][31:24] = 8'b00010000;
         instructions[5][23:16] = 8'd4;
         instructions[5][15:0] = 16'd3;
+
+        // end program
+        instructions[6] = 32'd0;
+
         clock = 1'b1;
+        reset = 1'b0;
 
         #1 assert(load_addr === 16'd0 & load_ctrl) else $fatal(1, "wrong load addr expected %b, got %b",
             16'd0, load_addr);
@@ -68,6 +75,33 @@ module tb;
                 $fatal(1, "wrong output of alu %d, expected %x got %x",
                 i, expected[i*16 +: 16], write_data[i*16 +: 16]);
         end
+
+        #10 assert(finished) else $fatal(1, "expected program to finish");
+
+        #clock reset = 1'b1;
+        #(!clock) reset = 1'b0;
+
+        assert(load_addr === 16'd0 & load_ctrl) else $fatal(1, "wrong load addr expected %b, got %b",
+            16'd0, load_addr);
+        load_data = 512'h3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d3e4d;
+
+        #4 assert(load_addr === 16'd1 & load_ctrl) else $fatal(1, "wrong load addr expected %b, got %b",
+            16'd1, load_addr);
+        load_data = 512'h40004000400040004000400040004000400040004000400040004000400040004000400040004000400040004000400040004000400040004000400040004000;
+
+        #4 assert(!load_ctrl) else $fatal(1, "Load ctrl during mov should be disabled");
+        expected = 512'h3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a3f1a;
+
+        #12 assert(write_addr === 16'd3 & write_ctrl) else
+            $fatal(1, "wrong write addr expected %b, got %b", 16'd3, load_addr);
+
+        for(i=0; i<32; i=i+1) begin
+            assert(write_data[i*16 +: 16] == expected[i*16 +: 16]) else
+                $fatal(1, "wrong output of alu %d, expected %x got %x",
+                i, expected[i*16 +: 16], write_data[i*16 +: 16]);
+        end
+
+        #10 assert(finished) else $fatal(1, "expected program to finish");
 
 
         $display("All test passed");
