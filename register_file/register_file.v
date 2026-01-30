@@ -1,6 +1,6 @@
 module reg_file #(
-    parameter ADDR_WIDTH = 8,
-    parameter DATA_WIDTH = 8
+    parameter int ADDR_WIDTH = 8,
+    parameter int DATA_WIDTH = 8
 )(
     input wire [ADDR_WIDTH-1:0] r1_addr,
     input wire [ADDR_WIDTH-1:0] r2_addr,
@@ -12,7 +12,7 @@ module reg_file #(
     output wire [DATA_WIDTH-1:0] r2_out
 );
 
-    localparam CAP = 1 << ADDR_WIDTH;
+    localparam int CAP = 1 << ADDR_WIDTH;
 
     reg [DATA_WIDTH-1:0] r1_out_reg;
     reg [DATA_WIDTH-1:0] r2_out_reg;
