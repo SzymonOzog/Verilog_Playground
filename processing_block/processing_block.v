@@ -4,6 +4,7 @@ module processing_block #(
     localparam int W=(CORES*BITS-1)
 )(
     input wire[31:0] instructions[65535],
+    input wire[15:0] block_idx,
     input wire[W:0] load_data,
     input wire clock,
     input wire reset,
@@ -15,7 +16,9 @@ module processing_block #(
     output wire finished
         );
 
-    reg[15:0] instruction_ptr = 16'd0;
+    wire[31:0] store_bid = {8'b00110000, 8'd255, block_idx};
+
+    int instruction_ptr = -1;
     reg[31:0] curr_instr;
 
     wire[3:0] instr_op = curr_instr[31:28];
@@ -68,10 +71,10 @@ module processing_block #(
 
     always @ (posedge clock) begin
         if (reset) begin
-            instruction_ptr = 16'd0;
+            instruction_ptr = -1;
             pipeline_stage = 1'b0;
         end
-        curr_instr = instructions[instruction_ptr];
+        curr_instr = (instruction_ptr == -1) ? store_bid : instructions[instruction_ptr];
     end
 
     always @ (negedge clock) begin
@@ -84,6 +87,6 @@ module processing_block #(
         begin
             pipeline_stage = 1'b1;
         end
-        curr_instr = instructions[instruction_ptr];
+        curr_instr = (instruction_ptr == -1) ? store_bid : instructions[instruction_ptr];
     end
 endmodule
