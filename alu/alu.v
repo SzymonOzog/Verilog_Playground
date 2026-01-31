@@ -32,5 +32,7 @@ module alu_bf16(
         float_multiplier_bf16 multiplier(a, b, clock, mul_y);
 
         assign y = (alu_ctrl == 4'b0001) ? add_y :
-                   (alu_ctrl == 4'b0010) ? mul_y : 8'd0;
+                   (alu_ctrl == 4'b0010) ? mul_y :
+                   (alu_ctrl == 4'b0011) ? a+b :
+                   8'd0;
 endmodule
