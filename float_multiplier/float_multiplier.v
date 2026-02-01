@@ -78,8 +78,8 @@ module float_multiplier_bf16(
         wire[7:0] a_e = a[14:7];
         wire[7:0] b_e = b[14:7];
 
-        wire[7:0] a_m = {1'b1, a[6:0]};
-        wire[7:0] b_m = {1'b1, b[6:0]};
+        wire[7:0] a_m = (a_e == 8'b0) ? {1'b0, a[6:0]} : {1'b1, a[6:0]};
+        wire[7:0] b_m = (b_e == 8'b0) ? {1'b0, b[6:0]} : {1'b1, b[6:0]};
 
         reg[7:0] y_e;
 
@@ -110,6 +110,8 @@ module float_multiplier_bf16(
             else 
             begin
                 y_e = a_e + b_e - BIAS;
+                y_e = (a_e == 8'b0) ? y_e + 1 : y_e;
+                y_e = (b_e == 8'b0) ? y_e + 1 : y_e;
                 if(y_m_mul[15])
                 begin
                     y_m = y_m_mul[14:8];
