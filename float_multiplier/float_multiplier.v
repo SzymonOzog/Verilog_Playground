@@ -52,7 +52,7 @@ module float_multiplier_e4m3(
                 begin
                     y_m = y_m_mul[5:3];
                     m_discard[3:1] = y_m_mul[2:0];
-                    m_discard[0] = 1'b0;
+                    m_discard[0] = 1'b1;
                     y_e = y_e;
                 end
                 round = G & (R | S | y_m[0]);
@@ -120,6 +120,7 @@ module float_multiplier_bf16(
                 begin
                     y_m = y_m_mul[13:7];
                     m_discard[7:1] = y_m_mul[6:0];
+                    m_discard[0] = 1'b1;
                     y_e = y_e;
                 end
                 round = G & (R | S | y_m[0]);
